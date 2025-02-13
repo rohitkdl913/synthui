@@ -1,8 +1,76 @@
-const Player = () => {
+import { MdFullscreen, MdPause, MdPlayArrow, MdVolumeOff, MdVolumeUp } from "react-icons/md";
+import { useEffect, useState } from "react";
+import { useProject } from "../../provider/project_provider";
+import APIRoute from "../../../api_route";
+
+interface PlayerProps {
+    videoRef: React.RefObject<HTMLVideoElement | null>;
+    setCurrentTime: (time: number) => void;
+    setDuration: (duration: number) => void;
+}
+
+const Player: React.FC<PlayerProps> = ({ videoRef, setCurrentTime, setDuration }) => {
+    const { project } = useProject();
+    const [muted, setMuted] = useState(false);
+    const [playing, setPlaying] = useState(false);
+
+    const togglePlayPause = () => {
+        if (playing) {
+            videoRef.current?.pause();
+        } else {
+            videoRef.current?.play();
+        }
+        setPlaying(!playing);
+    };
+
+    const toggleMuted = () => {
+        if (videoRef.current) {
+            videoRef.current.muted = !muted;
+        }
+        setMuted(!muted);
+    };
+
+    useEffect(() => {
+        const video = videoRef.current;
+        if (!video) return;
+
+        const handleTimeUpdate = () => setCurrentTime(video.currentTime);
+        const handleLoadedMetadata = () => setDuration(video.duration);
+
+        video.addEventListener("timeupdate", handleTimeUpdate);
+        video.addEventListener("loadedmetadata", handleLoadedMetadata);
+
+        return () => {
+            video.removeEventListener("timeupdate", handleTimeUpdate);
+            video.removeEventListener("loadedmetadata", handleLoadedMetadata);
+        };
+    }, [videoRef, setCurrentTime, setDuration]);
+
     return (
-        <div className="bg-black w-full flex-3 flex items-center justify-center">
-            <p className="text-white">Video Player</p>
-            <video src=""></video>
+        <div className="bg-black p-4 flex flex-col justify-between h-full">
+            {/* Video Container */}
+            <div className="relative bg-gray-800 rounded-lg h-[90%] flex items-center justify-center">
+                <video
+                    ref={videoRef}
+                    className="h-full rounded-lg"
+                    src={APIRoute.VideoStream + "/" + project?.projectId}
+                ></video>
+                <div className="absolute bottom-12 bg-gray-700 text-white px-4 py-2 rounded-md text-sm">
+                    SubtitleSynth is a great tool
+                </div>
+            </div>
+            {/* Controls */}
+            <div className="flex justify-between items-center py-4 text-white">
+                <div className="cursor-pointer" onClick={toggleMuted}>
+                    {muted ? <MdVolumeOff size={24} /> : <MdVolumeUp size={24} />}
+                </div>
+                <div className="cursor-pointer" onClick={togglePlayPause}>
+                    {playing ? <MdPause size={24} /> : <MdPlayArrow size={24} />}
+                </div>
+                <div className="cursor-pointer">
+                    <MdFullscreen size={24} />
+                </div>
+            </div>
         </div>
     );
 };

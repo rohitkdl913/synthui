@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useProject } from "../../provider/project_provider";
-import APIRoute from "../../../api_route";
+// import APIRoute from "../../../api_route";
 
 
 interface ProjectCreationDialogProp {
@@ -38,32 +38,32 @@ const ProjectCreationDialog: React.FC<ProjectCreationDialogProp> = ({ onClose, f
         const projectName = projectNameInputRef.current?.value;
         const translationType = projectTypeInputRef.current?.value;
 
-        setIsLoading(true);
-        const formData = new FormData();
-        formData.append("project_setting", JSON.stringify({ projectName, translationType }));
-        if (file) formData.append("in_file", file);
+        // setIsLoading(true);
+        // const formData = new FormData();
+        // formData.append("project_setting", JSON.stringify({ projectName, translationType }));
+        // if (file) formData.append("in_file", file);
 
         try {
-            const response = await fetch(APIRoute.CreateaProject, {
-                method: "POST",
-                headers: {
-                    accept: "application/json",
-                },
-                body: formData,
-            });
+            // const response = await fetch(APIRoute.CreateaProject, {
+            //     method: "POST",
+            //     headers: {
+            //         accept: "application/json",
+            //     },
+            //     body: formData,
+            // });
 
-            if (!response.ok) {
-                const errorData = await response.json();
-                console.error("API Error:", errorData);
-                throw new Error(`HTTP error! Status: ${response.status}, ${JSON.stringify(errorData)}`);
-            }
+            // if (!response.ok) {
+            //     const errorData = await response.json();
+            //     console.error("API Error:", errorData);
+            //     throw new Error(`HTTP error! Status: ${response.status}, ${JSON.stringify(errorData)}`);
+            // }
 
-            const data = await response.json();
-            console.log("Project created:", data);
+            // const data = await response.json();
+            // console.log("Project created:", data);
 
             // Save project data in context
             setProject({
-                projectId: data["data"]["id"] ?? "",
+                projectId:"3a4665ea49674f299426a966688fa62e",
                 projectName: projectName ?? "",
                 translationType: translationType ?? "",
 
