@@ -1,13 +1,11 @@
 import { useRef, useEffect, useState } from "react";
-import { BiRedo, BiUndo } from "react-icons/bi";
 import { MdAdd, MdRemove, MdOutlineTextFields } from "react-icons/md";
-import { Subtitle } from "../models/subtitle";
+import { useSubtitles, Subtitle } from "../../provider/subtitle_provider";
 
 interface TimelineProps {
     videoRef: React.RefObject<HTMLVideoElement | null>;
     currentTime: number;
     duration: number;
-    subtitles: Subtitle[];
     onSubtitleSelect: (id: string) => void;
 }
 
@@ -31,20 +29,14 @@ export default function Timeline({
     videoRef,
     currentTime,
     duration,
-    subtitles,
+
     onSubtitleSelect,
 }: TimelineProps) {
     const [time2pixel, setTime2pixel] = useState(20);
     const cursorRef = useRef<HTMLDivElement>(null);
     const timelineRef = useRef<HTMLDivElement>(null);
+    const { subtitles } = useSubtitles();
 
-    // Compute time2pixel so timeline fits container exactly (no horizontal scroll)
-    useEffect(() => {
-        if (timelineRef.current && duration > 0) {
-            const containerWidth = timelineRef.current.clientWidth;
-            setTime2pixel(containerWidth / duration);
-        }
-    }, [duration]);
 
     // Update cursor position on time change
     useEffect(() => {
@@ -58,9 +50,13 @@ export default function Timeline({
     // Automatic Cursor Scroller
     useEffect(() => {
         if (cursorRef.current) {
-            cursorRef.current.scrollIntoView({ behavior: "smooth"});
+            if (timelineRef != null) {
+                cursorRef.current.scrollIntoView({ behavior: "smooth", inline: "center" });
+            }
+
         }
     }, [currentTime]);
+
 
     const handleTimelineClick = (e: React.MouseEvent<HTMLDivElement>) => {
         if (!timelineRef.current || !videoRef.current) return;
@@ -77,8 +73,7 @@ export default function Timeline({
             {/* Top Controls */}
             <div className="flex justify-between items-center p-2 border border-gray-700 rounded-md">
                 <div className="flex gap-4">
-                    <BiUndo className="cursor-pointer hover:text-blue-400" />
-                    <BiRedo className="cursor-pointer hover:text-blue-400" />
+
                 </div>
                 <div className="text-sm font-semibold">
                     {secondsToTime(currentTime)} / {secondsToTime(duration)}
@@ -102,11 +97,11 @@ export default function Timeline({
                 onClick={handleTimelineClick}
             >
 
-               
+
                 {/* Playback Cursor */}
                 <div
                     ref={cursorRef}
-                    className="absolute top-0 bottom-0 w-[2px] bg-red-500 transition-all duration-100"
+                    className="absolute top-0 bottom-0 w-[2px] bg-red-500 transition-all duration-100 "
                 />
 
                 {/* Time Markers */}
@@ -132,18 +127,25 @@ export default function Timeline({
     );
 }
 
-const TimeTick = ({ time, time2pixel }: { time: number; time2pixel: number }) => (
-    <div
-        className="absolute text-xs text-gray-400"
-        style={{ left: time * time2pixel }}
-    >
-        {time % 5 === 0 ? (
-            <div className="border-l border-white pl-1">{time}</div>
-        ) : (
-            <div className="border-l border-gray-600 h-4"></div>
-        )}
-    </div>
-);
+const TimeTick = ({ time, time2pixel }: { time: number; time2pixel: number }) => {
+    // console.log(`Time : ${time} Time2Pixel: ${time2pixel}`);
+    return (
+
+        <div
+            className="absolute text-xs text-gray-400"
+            style={{ left: time * time2pixel }}
+        >
+
+
+            {time % 5 === 0 ? (
+                <div className="border-l border-white pl-1">{time}</div>
+            ) : (
+                <div className="border-l border-gray-600 h-4"></div>
+            )}
+        </div>
+    )
+}
+
 
 const SubtitleView = ({
     subtitle,
@@ -157,7 +159,7 @@ const SubtitleView = ({
     const width = (subtitle.end - subtitle.start) * time2pixel;
     return (
         <div
-            className="absolute top-0 flex items-start gap-2 px-2 py-1 text-sm bg-blue-500 rounded-md cursor-pointer hover:bg-blue-400"
+            className="absolute top-0 flex items-start gap-2 px-2 py-1 border-l-2 border-black text-sm bg-blue-500 rounded-md cursor-pointer hover:bg-blue-400"
             onClick={onClick}
             style={{
                 left: subtitle.start * time2pixel,

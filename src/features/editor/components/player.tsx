@@ -2,6 +2,7 @@ import { MdFullscreen, MdPause, MdPlayArrow, MdVolumeOff, MdVolumeUp } from "rea
 import { useEffect, useState } from "react";
 import { useProject } from "../../provider/project_provider";
 import APIRoute from "../../../api_route";
+import { useSubtitles } from "../../provider/subtitle_provider";
 
 interface PlayerProps {
     videoRef: React.RefObject<HTMLVideoElement | null>;
@@ -11,8 +12,12 @@ interface PlayerProps {
 
 const Player: React.FC<PlayerProps> = ({ videoRef, setCurrentTime, setDuration }) => {
     const { project } = useProject();
+    const { subtitles } = useSubtitles(); // Get subtitles from context
     const [muted, setMuted] = useState(false);
     const [playing, setPlaying] = useState(false);
+
+    const [currentSubtitle, setCurrentSubtitle] = useState("");
+
 
     const togglePlayPause = () => {
         if (playing) {
@@ -46,18 +51,38 @@ const Player: React.FC<PlayerProps> = ({ videoRef, setCurrentTime, setDuration }
         };
     }, [videoRef, setCurrentTime, setDuration]);
 
+
+    useEffect(() => {
+        const updateSubtitle = () => {
+            if (!videoRef.current) return;
+
+            const currentTime = videoRef.current.currentTime;
+            const activeSubtitle = subtitles.find(sub =>
+                currentTime >= sub.start && currentTime <= sub.end
+            );
+
+            setCurrentSubtitle(activeSubtitle?.text || "");
+        };
+
+        const interval = setInterval(updateSubtitle, 100);
+        return () => clearInterval(interval);
+    }, [subtitles, videoRef]);
+
     return (
         <div className="bg-black p-4 flex flex-col justify-between h-full">
             {/* Video Container */}
             <div className="relative bg-gray-800 rounded-lg h-[90%] flex items-center justify-center">
                 <video
+                    preload="auto"
                     ref={videoRef}
                     className="h-full rounded-lg"
                     src={APIRoute.VideoStream + "/" + project?.projectId}
                 ></video>
-                <div className="absolute bottom-12 bg-gray-700 text-white px-4 py-2 rounded-md text-sm">
-                    SubtitleSynth is a great tool
-                </div>
+                {currentSubtitle && (
+                    <div className="absolute bottom-12 bg-gray-700 text-white px-4 py-2 rounded-md text-sm">
+                        {currentSubtitle}
+                    </div>
+                )}
             </div>
             {/* Controls */}
             <div className="flex justify-between items-center py-4 text-white">

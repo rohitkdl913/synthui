@@ -4,6 +4,7 @@ interface Project {
     projectName: string;
     translationType: string;
     projectId: string;
+    status:boolean;
 }
 
 interface ProjectContextType {

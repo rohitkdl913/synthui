@@ -1,9 +1,8 @@
 interface HeadersProp{
     projectName:string,
-    projectId: string | undefined
     showExport: () => void;
 }
-const Headers:React.FC<HeadersProp> = ({projectName,projectId, showExport}) => {
+const Headers:React.FC<HeadersProp> = ({projectName, showExport}) => {
     return (
         <div className="p-2.5 flex items-center justify-between w-full">
         <div className="text-xl font-semibold">

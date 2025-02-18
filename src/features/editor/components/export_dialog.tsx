@@ -1,3 +1,4 @@
+import APIRoute from "../../../api_route";
 import { useProject } from "../../provider/project_provider";
 
 interface ExportDialogProp {
@@ -10,11 +11,39 @@ const ExportDialog: React.FC<ExportDialogProp> = ({ onClose }) => {
 
     const { project } = useProject();
 
+    const handleExport = async () => {
+        if (!project) return;
+
+        try {
+            // Assuming the API returns the SRT file for subtitles
+            const response = await fetch(`${APIRoute.exportSubtitle}/${project.projectId}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/octet-stream', // For binary file download
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to export subtitles');
+            }
+
+            // Handle the SRT file response
+            const blob = await response.blob();
+            const downloadUrl = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = downloadUrl;
+            link.download = `${project.projectName}.srt`; // Name the file with project name
+            link.click();
+
+        } catch (error) {
+            console.error('Export failed:', error);
+        }
+    };
 
     if (!project) {
         return <p>No project loaded.</p>;
     }
-    return <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+    return <div className="fixed inset-0 flex items-center justify-center backdrop-blur-sm">
         <div className="bg-white p-6 rounded-lg shadow-lg w-96 relative">
             {/* Close Button */}
             <button
@@ -35,12 +64,12 @@ const ExportDialog: React.FC<ExportDialogProp> = ({ onClose }) => {
 
             {/* Export Options */}
             <select className="w-full p-2 border rounded mb-4">
-                <option>Embed video subtitle</option>
+                {/* <option>Embed video subtitle</option> */}
                 <option>Only subtitle file</option>
             </select>
 
             {/* Export Button */}
-            <button className="bg-blue-500 text-white w-full py-2 rounded hover:bg-blue-600">
+            <button className="bg-blue-500 text-white w-full py-2 rounded hover:bg-blue-600" onClick={handleExport}>
                 Export
             </button>
         </div>

@@ -1,3 +1,7 @@
+//@depreciated dont use this page 
+
+
+
 import React, { useRef, useState } from 'react';
 import logo from "../../../assets/logo/logo.png";
 import ProjectCreationDialog from '../components/project_creation_dialog';

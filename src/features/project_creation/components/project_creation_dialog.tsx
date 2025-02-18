@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useProject } from "../../provider/project_provider";
-// import APIRoute from "../../../api_route";
+
+import APIRoute from "../../../api_route";
 
 
 interface ProjectCreationDialogProp {
@@ -14,7 +14,7 @@ interface ProjectCreationDialogProp {
 const ProjectCreationDialog: React.FC<ProjectCreationDialogProp> = ({ onClose, fileName, file, fileSize }) => {
     const projectNameInputRef = useRef<HTMLInputElement>(null);
     const projectTypeInputRef = useRef<HTMLSelectElement>(null);
-    const { setProject } = useProject();
+
     const navigate = useNavigate();
 
     const [errorMessage, setErrorMessage] = useState("");
@@ -38,39 +38,32 @@ const ProjectCreationDialog: React.FC<ProjectCreationDialogProp> = ({ onClose, f
         const projectName = projectNameInputRef.current?.value;
         const translationType = projectTypeInputRef.current?.value;
 
-        // setIsLoading(true);
-        // const formData = new FormData();
-        // formData.append("project_setting", JSON.stringify({ projectName, translationType }));
-        // if (file) formData.append("in_file", file);
+        setIsLoading(true);
+        const formData = new FormData();
+        formData.append("project_setting", JSON.stringify({ projectName, translationType }));
+        if (file) formData.append("in_file", file);
 
         try {
-            // const response = await fetch(APIRoute.CreateaProject, {
-            //     method: "POST",
-            //     headers: {
-            //         accept: "application/json",
-            //     },
-            //     body: formData,
-            // });
-
-            // if (!response.ok) {
-            //     const errorData = await response.json();
-            //     console.error("API Error:", errorData);
-            //     throw new Error(`HTTP error! Status: ${response.status}, ${JSON.stringify(errorData)}`);
-            // }
-
-            // const data = await response.json();
-            // console.log("Project created:", data);
-
-            // Save project data in context
-            setProject({
-                projectId:"3a4665ea49674f299426a966688fa62e",
-                projectName: projectName ?? "",
-                translationType: translationType ?? "",
-
+            const response = await fetch(APIRoute.CreateaProject, {
+                method: "POST",
+                headers: {
+                    accept: "application/json",
+                },
+                body: formData,
             });
 
+            if (!response.ok) {
+                const errorData = await response.json();
+                console.error("API Error:", errorData);
+                throw new Error(`HTTP error! Status: ${response.status}, ${JSON.stringify(errorData)}`);
+            }
+
+            const data = await response.json();
+            console.log("Project created:", data);
+
+
             // Navigate to editor page
-            navigate("/editor");
+            navigate(`/editor/${data.data.id}`);
         } catch (e: any) {
             console.error("Error creating project:", e);
             setErrorMessage(e.message || "An unexpected error occurred.");
@@ -80,7 +73,7 @@ const ProjectCreationDialog: React.FC<ProjectCreationDialogProp> = ({ onClose, f
     };
 
     return (
-        <div className="fixed inset-0 flex items-center justify-center bg-gray-100">
+        <div className="fixed inset-0 flex items-center justify-center backdrop-blur-sm">
             <div className="bg-white fixed p-8 rounded-lg shadow-lg w-[90%] md:w-[60%] h-auto flex flex-col justify-center">
                 <button onClick={onClose} className="absolute top-4 right-4 text-gray-600 hover:text-gray-900 text-3xl cursor-pointer">
                     &times;
@@ -101,7 +94,7 @@ const ProjectCreationDialog: React.FC<ProjectCreationDialogProp> = ({ onClose, f
                         <input type="text" placeholder="Enter the project name" ref={projectNameInputRef} className="border p-2 rounded w-full mt-2" />
                         <select className="border p-2 rounded w-full mt-2" ref={projectTypeInputRef}>
                             <option value={"BULK"}>Bulk translation</option>
-                            <option value={"REALTIME"}>Real-time Translation</option>
+                            {/* <option value={"REALTIME"}>Real-time Translation</option> */}
                         </select>
                         <button className="bg-blue-500 text-white px-4 py-2 rounded w-full" onClick={createProject}>
                             {isLoading ? "Creating..." : "Create"}

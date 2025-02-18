@@ -1,67 +1,50 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { SubtitleEdit } from "./subtitle_edit";
-import { Subtitle } from "../models/subtitle";
+import { Subtitle, useSubtitles } from "../../provider/subtitle_provider";
+import { useProject } from "../../provider/project_provider";
+import APIRoute from "../../../api_route";
+
+
 
 
 
 const formatTime = (seconds: number) => {
-  const date = new Date(seconds * 1000);
-  return date.toISOString().substr(11, 8);
+  const hrs = Math.floor(seconds / 3600);
+  const mins = Math.floor((seconds % 3600) / 60);
+  const secs = Math.floor(seconds % 60);
+
+  return `${hrs}:${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
 };
 
+
+
+
+
 const SidePanel: React.FC = () => {
-  const [subtitles, setSubtitles] = useState<Subtitle[]>([]);
-  const [loading, setLoading] = useState(true);
+
+  const [loading, setLoading] = useState<boolean>(false);
   const [selectedSubtitle, setSelectedSubtitle] = useState<Subtitle | null>(null);
-  const [editMode, setEditMode] = useState(false);
+  const [editMode, setEditMode] = useState<boolean>(false);
+  const { subtitles } = useSubtitles();
 
-  useEffect(() => {
-    // Simulate fetching data
-    setTimeout(() => {
-      setSubtitles([]);
-      setLoading(false);
-    }, 2000);
-  }, []);
 
-  const handleSaveSubtitle = (updatedSub: Subtitle) => {
-    setSubtitles(prev =>
-      prev.map(sub => sub.id === updatedSub.id ? updatedSub : sub)
-    );
-    setEditMode(false);
-  };
+
+
+
+
 
   const handleAddSubtitle = () => {
-    const newSub = {
-      id: Date.now().toString(),
-      text: "New Subtitle",
-      start: 0,
-      end: 5
-    };
-    setSubtitles(prev => [...prev, newSub]);
-    setSelectedSubtitle(newSub);
+    setSelectedSubtitle(null);
     setEditMode(true);
   };
 
-  const handleDeleteSubtitle = (id: string) => {
-    setSubtitles(prev => prev.filter(sub => sub.id !== id));
-    setEditMode(false);
-  };
 
   return (
     <aside className="w-64 flex-shrink-0 p-4 flex flex-col bg-gray-800 text-white overflow-y-scroll scrollbar-hide">
       {editMode ? (
         <SubtitleEdit
-          sub={selectedSubtitle ?? {
-            id: Date.now().toString(),
-            text: "New Subtitle",
-            start: 0,
-            end: 5
-          }}
-          onSave={(sub) => handleSaveSubtitle(sub)}
-          onDelete={() => {
-            handleDeleteSubtitle(selectedSubtitle!.id);
-            setEditMode(false);
-          }}
+          //TODO: should be something else
+          sub={selectedSubtitle}
           onClose={() => setEditMode(false)}
         />
       ) : (
@@ -69,7 +52,9 @@ const SidePanel: React.FC = () => {
           <div className="flex items-center justify-between">
             <span className="text-lg font-bold">Subtitles</span>
             <button
-              onClick={handleAddSubtitle}
+              onClick={() => {
+                handleAddSubtitle()
+              }}
               className="px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
             >
               +
@@ -91,7 +76,7 @@ const SidePanel: React.FC = () => {
                   }}
                   className="p-2 border-b border-gray-700 cursor-pointer hover:bg-gray-700 transition-colors"
                 >
-                  {sub.text}
+                  <span className=""> {sub.text}</span>
                   <div className="text-sm text-gray-400">
                     {formatTime(sub.start)} - {formatTime(sub.end)}
                   </div>
