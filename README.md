@@ -35,6 +35,13 @@ This project is a **React-based** user interface for the Subtitle Generation Ser
 npm run dev
 ```
 
+## Screenshots
+Below is a screenshot of the UI:
+![screenshot](screenshots//project_list.png)
+![screenshot](screenshots//create_project.png)
+![screenshot](screenshots//editor.png)
+
+
 ## API Integration
 Update VITE_TRANSLATION_SERVER_URL env variable to configure API endpoints.
 
