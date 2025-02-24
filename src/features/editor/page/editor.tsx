@@ -108,7 +108,7 @@ const EditorPage: React.FC = () => {
 
         console.log(`Get the data ${subtitleData} ${event.data}`)
         addSubtitle({
-          id: (indexRef.current++).toString(),
+          id: subtitleData.id,
           text: subtitleData.text,
           start: subtitleData.start,
           end: subtitleData.end,

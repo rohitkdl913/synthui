@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { MdAdd, MdAlignHorizontalCenter, MdAlignHorizontalLeft, MdAlignHorizontalRight, MdClose, MdRemove } from "react-icons/md";
 import { Subtitle, useSubtitles } from "../../provider/subtitle_provider";
 import APIRoute from "../../../api_route";
+import { useProject } from "../../provider/project_provider";
 
 interface SubtitleEditProps {
   onClose: () => void;
@@ -10,6 +11,7 @@ interface SubtitleEditProps {
 export const SubtitleEdit: React.FC<SubtitleEditProps> = ({ onClose }) => {
 
   const { selectedSubtitle } = useSubtitles();
+  const { project } = useProject();
 
   let sub = selectedSubtitle;
 
@@ -56,7 +58,7 @@ export const SubtitleEdit: React.FC<SubtitleEditProps> = ({ onClose }) => {
       start: Number(subtitleStartTimeRef.current?.value) || 0,
       end: Number(subtitleEndimeRef.current?.value) || 0,
       text: subtitleTextAreaRef.current?.value ?? "",
-      language:"np"
+      language: "np"
     };
 
     console.log(`Saved data is ${JSON.stringify(subtitle)}`)
@@ -64,6 +66,7 @@ export const SubtitleEdit: React.FC<SubtitleEditProps> = ({ onClose }) => {
     try {
       if (isNew) {
         // Create new subtitle
+        subtitle.id = project?.projectId ?? "";
         const response = await fetch(`${APIRoute.addSubtitle}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -74,7 +77,14 @@ export const SubtitleEdit: React.FC<SubtitleEditProps> = ({ onClose }) => {
         const createdSub = await response.json();
 
         // Update with server-generated ID
-        updateSubtitle(sub.id, { ...sub, ...createdSub });
+        addSubtitle({
+          id: createdSub.id, // Assuming `id` is not provided, using index as fallback
+          text: createdSub.text,
+          start: createdSub.start_time,
+          end: createdSub.end_time,
+          alignment: 'center',
+          fontSize: 16
+        });
       } else {
         // Update existing subtitle
         const response = await fetch(`${APIRoute.addSubtitle}/${sub.id}`, {
