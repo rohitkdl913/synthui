@@ -22,7 +22,7 @@ const EditorPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const { addSubtitle } = useSubtitles()
+  const { addSubtitle,setSelectedSubtitle } = useSubtitles()
   const navigate = useNavigate();
 
   const [message, setMessage] = useState<string | null>(null)
@@ -68,6 +68,7 @@ const EditorPage: React.FC = () => {
             for (let index = 0; index < formattedSubtitles.length; index++) {
               addSubtitle(formattedSubtitles[index])
             }
+            setSelectedSubtitle(null);
           }
 
         }
@@ -176,6 +177,7 @@ const EditorPage: React.FC = () => {
         {/* <SidePanel /> */}
         <SidePanel />
         <div className="flex flex-col flex-1 overflow-hidden">
+          
           {/* Player takes remaining vertical space */}
           <div className="flex-1 overflow-hidden">
             <Player
@@ -184,13 +186,13 @@ const EditorPage: React.FC = () => {
               setDuration={setDuration}
             />
           </div>
+
           {/* Timeline fixed to bottom */}
           <div className="h-1/4 overflow-hidden">
             {videoRef != null && <Timeline
               videoRef={videoRef}
               currentTime={currentTime}
               duration={duration}
-              onSubtitleSelect={(id) => console.log("Selected subtitle:", id)}
             />
             }
 

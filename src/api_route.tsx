@@ -15,6 +15,10 @@ class APIRoute {
 
 
     static deleteProject=apiUrl+"/delete/project"
+
+
+    static addSubtitle= apiUrl+"/subtitle"
+
 }
 
 export default  APIRoute;

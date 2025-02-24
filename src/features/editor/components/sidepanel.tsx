@@ -1,8 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { SubtitleEdit } from "./subtitle_edit";
 import { Subtitle, useSubtitles } from "../../provider/subtitle_provider";
-import { useProject } from "../../provider/project_provider";
-import APIRoute from "../../../api_route";
+import { Plus } from "react-feather";
 
 
 
@@ -23,9 +22,9 @@ const formatTime = (seconds: number) => {
 const SidePanel: React.FC = () => {
 
   const [loading, setLoading] = useState<boolean>(false);
-  const [selectedSubtitle, setSelectedSubtitle] = useState<Subtitle | null>(null);
+
   const [editMode, setEditMode] = useState<boolean>(false);
-  const { subtitles } = useSubtitles();
+  const { subtitles, setSelectedSubtitle, selectedSubtitle } = useSubtitles();
 
 
 
@@ -40,12 +39,15 @@ const SidePanel: React.FC = () => {
 
 
   return (
-    <aside className="w-64 flex-shrink-0 p-4 flex flex-col bg-gray-800 text-white overflow-y-scroll scrollbar-hide">
-      {editMode ? (
+    <aside className="w-64 flex-shrink-0 p-2 flex flex-col bg-gray-800 text-white overflow-y-scroll scrollbar-hide">
+      {editMode || selectedSubtitle != null ? (
         <SubtitleEdit
-          //TODO: should be something else
-          sub={selectedSubtitle}
-          onClose={() => setEditMode(false)}
+         
+          key={selectedSubtitle?.id} // Force re-render when subtitle changes
+          onClose={() => {
+            setEditMode(false);
+            setSelectedSubtitle(null)
+          }}
         />
       ) : (
         <>
@@ -55,9 +57,9 @@ const SidePanel: React.FC = () => {
               onClick={() => {
                 handleAddSubtitle()
               }}
-              className="px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+              className="bg-blue-500 text-white rounded-full p-1  hover:bg-blue-600 transition-colors"
             >
-              +
+              <Plus></Plus>
             </button>
           </div>
           {loading ? (
@@ -65,7 +67,7 @@ const SidePanel: React.FC = () => {
               <span className="text-gray-500">Loading...</span>
             </div>
           ) : (
-            <ul className="mt-4 space-y-2">
+            <ul className="mt-4 space-y-2 ">
 
               {subtitles && subtitles.length > 0 ? subtitles.map((sub) => (
                 <li
@@ -74,9 +76,9 @@ const SidePanel: React.FC = () => {
                     setSelectedSubtitle(sub);
                     setEditMode(true);
                   }}
-                  className="p-2 border-b border-gray-700 cursor-pointer hover:bg-gray-700 transition-colors"
+                  className="border-b border-gray-700 cursor-pointer hover:bg-gray-700 transition-colors"
                 >
-                  <span className=""> {sub.text}</span>
+                  <p className="whitespace-nowrap overflow-hidden text-ellipsis w-55"> {sub.text}</p>
                   <div className="text-sm text-gray-400">
                     {formatTime(sub.start)} - {formatTime(sub.end)}
                   </div>

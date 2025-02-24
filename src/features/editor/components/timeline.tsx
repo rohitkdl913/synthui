@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState, MouseEventHandler } from "react";
 import { MdAdd, MdRemove, MdOutlineTextFields } from "react-icons/md";
 import { useSubtitles, Subtitle } from "../../provider/subtitle_provider";
 
@@ -6,7 +6,7 @@ interface TimelineProps {
     videoRef: React.RefObject<HTMLVideoElement | null>;
     currentTime: number;
     duration: number;
-    onSubtitleSelect: (id: string) => void;
+
 }
 
 
@@ -30,12 +30,12 @@ export default function Timeline({
     currentTime,
     duration,
 
-    onSubtitleSelect,
+
 }: TimelineProps) {
     const [time2pixel, setTime2pixel] = useState(20);
     const cursorRef = useRef<HTMLDivElement>(null);
     const timelineRef = useRef<HTMLDivElement>(null);
-    const { subtitles } = useSubtitles();
+    const { subtitles, setSelectedSubtitle } = useSubtitles();
 
 
     // Update cursor position on time change
@@ -101,7 +101,7 @@ export default function Timeline({
                 {/* Playback Cursor */}
                 <div
                     ref={cursorRef}
-                    className="absolute top-0 bottom-0 w-[2px] bg-red-500 transition-all duration-100 "
+                    className="absolute top-0 bottom-0 w-[2px] bg-red-500 transition-all duration-100 z-10"
                 />
 
                 {/* Time Markers */}
@@ -118,7 +118,10 @@ export default function Timeline({
                             key={sub.id}
                             subtitle={sub}
                             time2pixel={time2pixel}
-                            onClick={() => onSubtitleSelect(sub.id)}
+                            onClick={(event) => {
+                                event.stopPropagation(); // Stop event from bubbling to timeline
+                                setSelectedSubtitle(sub);
+                            }}
                         />
                     ))}
                 </div>
@@ -154,13 +157,13 @@ const SubtitleView = ({
 }: {
     subtitle: Subtitle;
     time2pixel: number;
-    onClick: () => void;
+    onClick: (event: React.MouseEvent<HTMLElement>) => void;
 }) => {
     const width = (subtitle.end - subtitle.start) * time2pixel;
     return (
         <div
             className="absolute top-0 flex items-start gap-2 px-2 py-1 border-l-2 border-black text-sm bg-blue-500 rounded-md cursor-pointer hover:bg-blue-400"
-            onClick={onClick}
+            onClick={(event: React.MouseEvent<HTMLElement>) => onClick(event)}
             style={{
                 left: subtitle.start * time2pixel,
                 width: width < 20 ? 20 : width,

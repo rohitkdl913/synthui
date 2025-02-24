@@ -79,7 +79,7 @@ const Player: React.FC<PlayerProps> = ({ videoRef, setCurrentTime, setDuration }
                     src={APIRoute.VideoStream + "/" + project?.projectId}
                 ></video>
                 {currentSubtitle && (
-                    <div className="absolute bottom-12 bg-gray-700 text-white px-4 py-2 rounded-md text-sm">
+                    <div className={`absolute bottom-4 backdrop-blur text-white px-4 py-2 rounded-md text-sm text-center`} style={{width:videoRef.current?.clientWidth}}>
                         {currentSubtitle}
                     </div>
                 )}

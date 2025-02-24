@@ -43,7 +43,7 @@ const ExportDialog: React.FC<ExportDialogProp> = ({ onClose }) => {
     if (!project) {
         return <p>No project loaded.</p>;
     }
-    return <div className="fixed inset-0 flex items-center justify-center backdrop-blur-sm">
+    return <div className="fixed inset-0 flex items-center justify-center backdrop-blur-sm z-100">
         <div className="bg-white p-6 rounded-lg shadow-lg w-96 relative">
             {/* Close Button */}
             <button
@@ -58,7 +58,9 @@ const ExportDialog: React.FC<ExportDialogProp> = ({ onClose }) => {
 
             {/* Project Name */}
             <div className="flex items-center gap-4 mb-4">
-                <div className="w-16 h-16 bg-gray-200 rounded"></div>
+                <div className="w-25 h-16 bg-gray-200 rounded">
+                    <img src={`${APIRoute.ThumbnailStream}/${project.projectId}`} alt={project.projectName} className="w-full h-full object-fill" />
+                </div>
                 <p className="font-semibold">{project.projectName}</p>
             </div>
 

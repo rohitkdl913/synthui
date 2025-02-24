@@ -1,13 +1,17 @@
 import { useEffect, useRef, useState } from "react";
 import { MdAdd, MdAlignHorizontalCenter, MdAlignHorizontalLeft, MdAlignHorizontalRight, MdClose, MdRemove } from "react-icons/md";
 import { Subtitle, useSubtitles } from "../../provider/subtitle_provider";
+import APIRoute from "../../../api_route";
 
 interface SubtitleEditProps {
-  sub: Subtitle | null;
   onClose: () => void;
 }
 
-export const SubtitleEdit: React.FC<SubtitleEditProps> = ({ sub, onClose }) => {
+export const SubtitleEdit: React.FC<SubtitleEditProps> = ({ onClose }) => {
+
+  const { selectedSubtitle } = useSubtitles();
+
+  let sub = selectedSubtitle;
 
   //It track that we are creating new subtitle or not 
   const isNew: boolean = sub == null;
@@ -26,89 +30,66 @@ export const SubtitleEdit: React.FC<SubtitleEditProps> = ({ sub, onClose }) => {
     end: 5
   };
 
-  // Process API stack
-  const processApiStack = () => {
-    const actions = apiStack.current;
-    apiStack.current = [];
-    // Simulate API calls (replace with actual API requests)
-    actions.forEach(action => {
-      console.log(`API call: ${action.type}`, action.data);
+  const onDelete = async () => {
+    try {
+      // Optimistic UI update
+      deleteSubtitle(sub.id);
 
-      switch (action.type) {
-        case 'add':
-          fetch('/subtitle/', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              project_id: action.data.id,
-              language: "nepali",
-              start_time: action.data.start,
-              end_time: action.data.end,
-              text: action.data.text
-            })
-          })
-            .then(response => {
-              if (!response.ok) throw new Error('Create failed');
-              return response.json();
-            })
-            .then(createdSub => {
-              // Update frontend ID with backend-generated ID if needed
-              updateSubtitle(action.data.id, { ...action.data, id: createdSub.id });
-            });
-          break;
+      // API call
+      const response = await fetch(`${APIRoute.addSubtitle}/${sub.id}`, {
+        method: 'DELETE'
+      });
 
-        case 'update':
-          fetch(`/subtitle/${action.data.id}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              text: action.data.text,
-              start_time: action.data.start,
-              end_time: action.data.end
-            })
-          });
-          break;
+      if (!response.ok) throw new Error('Delete failed');
+    } catch (error) {
+      // Revert on error
+      addSubtitle(sub);
+      console.error('Delete failed:', error);
+    }
 
-        case 'delete':
-          fetch(`/subtitle/${action.data.id}`, {
-            method: 'DELETE'
-          });
-          break;
-      }
-
-    });
-  };
-
-  // Schedule API processing with debounce
-  const scheduleApiProcessing = () => {
-    if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    timeoutRef.current = setTimeout(processApiStack, 2000); // Batch after 2 seconds
-  };
-
-  const onDelete = () => {
-    deleteSubtitle(sub.id); // Optimistic UI update
-    apiStack.current.push({ type: 'delete', data: sub });
-    scheduleApiProcessing();
     onClose();
   };
 
-  const onSave = () => {
-    const subtitle: Subtitle = {
+  const onSave = async () => {
+    const subtitle = {
       id: sub.id,
-      text: subtitleTextAreaRef.current?.value ?? "",
       start: Number(subtitleStartTimeRef.current?.value) || 0,
-      end: Number(subtitleEndimeRef.current?.value) || 0
+      end: Number(subtitleEndimeRef.current?.value) || 0,
+      text: subtitleTextAreaRef.current?.value ?? "",
+      language:"np"
     };
 
-    if (isNew) {
-      addSubtitle(subtitle);
-      apiStack.current.push({ type: 'add', data: subtitle });
-    } else {
-      updateSubtitle(sub.id, subtitle);
-      apiStack.current.push({ type: 'update', data: subtitle });
-    }
+    console.log(`Saved data is ${JSON.stringify(subtitle)}`)
 
-    scheduleApiProcessing();
+    try {
+      if (isNew) {
+        // Create new subtitle
+        const response = await fetch(`${APIRoute.addSubtitle}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(subtitle)
+        });
+
+        if (!response.ok) throw new Error('Create failed');
+        const createdSub = await response.json();
+
+        // Update with server-generated ID
+        updateSubtitle(sub.id, { ...sub, ...createdSub });
+      } else {
+        // Update existing subtitle
+        const response = await fetch(`${APIRoute.addSubtitle}/${sub.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(subtitle)
+        });
+
+        if (!response.ok) throw new Error('Update failed');
+        updateSubtitle(sub.id, { ...sub, ...subtitle });
+      }
+    } catch (error) {
+      console.error('Operation failed:', error);
+      // Add error handling logic here
+    }
     onClose();
   };
 
