@@ -239,7 +239,7 @@ const ProjectList: React.FC = () => {
             );
             eventSource.close();
         });
-
+       
         eventSource.onerror = () => {
             console.error(`Error in SSE for project ${projectId}, retrying in 5s...`);
             eventSource.close();
