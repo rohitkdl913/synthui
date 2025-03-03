@@ -1,26 +1,71 @@
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-
+import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import Home from './features/home/pages/home';
+import LoginPage from './features/auth/pages/login';
+import SignupPage from './features/auth/pages/signup';
+import Dashboard from './features/dashboard/pages/dashboard';
+import { ToastProvider } from './features/provider/toast_provider';
+import { AuthProvider, ProtectedRoute } from './features/provider/auth_provider';
+import { DialogProvider } from './features/provider/dialog_provider';
+import SettingsLayout from './features/dashboard/pages/settings/settings_layout';
+// import SubtitleSettings from './features/dashboard/pages/settings/subtitle_settings';
+import SubtitleSettings from './features/dashboard/pages/settings/subtitle_settings';
+import ApplicationSettings from './features/dashboard/pages/settings/application_settings';
+import AccountSettings from './features/dashboard/pages/settings/account_settings';
 import { ProjectProvider } from './features/provider/project_provider';
-import EditorPage from './features/editor/page/editor';
-import ProjectList from './features/project_creation/page/project_page';
+import Editor from './features/editor/page/editor';
 import { SubtitleProvider } from './features/provider/subtitle_provider';
 
-const App = () => {
+
+
+function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<ProjectList />} />
-        <Route path="/editor/:id" element={
-          <ProjectProvider>
-            <SubtitleProvider>
-              <EditorPage />
-            </SubtitleProvider>
-          </ProjectProvider>
-        } />
-      </Routes>
-    </Router>
+    <BrowserRouter>
+      <ToastProvider>
+        <ProjectProvider>
+
+          <DialogProvider>
+            <AuthProvider>
+
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/signup" element={<SignupPage />} />
+
+
+                <Route
+                  path="/dashboard"
+                  element={
+                    <ProtectedRoute>
+                      <Dashboard />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route path="/dashboard/settings" element={<SettingsLayout />}>
+                  <Route index element={<SubtitleSettings />} />
+                  <Route path="subtitle" element={<SubtitleSettings />} />
+                  <Route path="application" element={<ApplicationSettings />} />
+                  <Route path="account" element={<AccountSettings />} />
+                </Route>
+
+
+                <Route path="/editor/:id" element={
+                  <SubtitleProvider>
+                    <Editor />
+                  </SubtitleProvider>
+
+                } />
+
+              </Routes>
+
+            </AuthProvider>
+          </DialogProvider>
+        </ProjectProvider>
+      </ToastProvider>
+    </BrowserRouter >
+
 
   );
-};
 
-export default App;
+}
+
+export default App

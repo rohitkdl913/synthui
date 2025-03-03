@@ -1,5 +1,7 @@
-import { useRef, useEffect, useState, MouseEventHandler } from "react";
-import { MdAdd, MdRemove, MdOutlineTextFields } from "react-icons/md";
+import { useRef, useEffect, useState } from "react";
+import { Plus, Minus, Edit } from 'lucide-react';
+
+
 import { useSubtitles, Subtitle } from "../../provider/subtitle_provider";
 
 interface TimelineProps {
@@ -37,7 +39,6 @@ export default function Timeline({
     const timelineRef = useRef<HTMLDivElement>(null);
     const { subtitles, setSelectedSubtitle } = useSubtitles();
 
-
     // Update cursor position on time change
     useEffect(() => {
         if (cursorRef.current) {
@@ -69,7 +70,7 @@ export default function Timeline({
     };
 
     return (
-        <div className="p-4 border border-gray-700 h-full flex flex-col gap-2 bg-gray-900 text-white">
+        <div className="p-4 border-t border-l rounded-sm border-gray-200 h-full flex flex-col gap-2 ">
             {/* Top Controls */}
             <div className="flex justify-between items-center p-2 border border-gray-700 rounded-md">
                 <div className="flex gap-4">
@@ -79,11 +80,11 @@ export default function Timeline({
                     {secondsToTime(currentTime)} / {secondsToTime(duration)}
                 </div>
                 <div className="flex gap-4">
-                    <MdAdd
+                    <Plus
                         className="cursor-pointer hover:text-green-400"
                         onClick={() => setTime2pixel((prev) => Math.min(prev + 5, 50))}
                     />
-                    <MdRemove
+                    <Minus
                         className="cursor-pointer hover:text-red-400"
                         onClick={() => setTime2pixel((prev) => Math.max(prev - 5, 15))}
                     />
@@ -131,7 +132,7 @@ export default function Timeline({
 }
 
 const TimeTick = ({ time, time2pixel }: { time: number; time2pixel: number }) => {
-    // console.log(`Time : ${time} Time2Pixel: ${time2pixel}`);
+
     return (
 
         <div
@@ -141,9 +142,9 @@ const TimeTick = ({ time, time2pixel }: { time: number; time2pixel: number }) =>
 
 
             {time % 5 === 0 ? (
-                <div className="border-l border-white pl-1">{time}</div>
+                <div className="border-l  border-gray-600 pl-1">{time}</div>
             ) : (
-                <div className="border-l border-gray-600 h-4"></div>
+                <div className="border-l  border-gray-600 h-4"></div>
             )}
         </div>
     )
@@ -171,7 +172,7 @@ const SubtitleView = ({
                 overflow: "hidden",
             }}
         >
-            <MdOutlineTextFields className="mt-1" />
+            <Edit className="mt-1" />
             <span className="truncate leading-tight">{subtitle.text}</span>
         </div>
     );

@@ -1,24 +1,27 @@
 import { createContext, useContext, useState, ReactNode } from "react";
+import { Project } from "../model/project";
 
-interface Project {
-    projectName: string;
-    translationType: string;
-    projectId: string;
-    status:boolean;
-}
+
 
 interface ProjectContextType {
-    project: Project | null;
-    setProject: (project: Project) => void;
+    projects: Project[];
+    recentProjects: Project[];
+    setProjects: (projects: Project[]) => void;
+    setRecentProjects: (projects: Project[]) => void;
+    addProject: (project: Project) => void;
 }
 
 const ProjectContext = createContext<ProjectContextType | undefined>(undefined);
 
 export const ProjectProvider = ({ children }: { children: ReactNode }) => {
-    const [project, setProject] = useState<Project | null>(null);
+    const [projects, setProjects] = useState<Project[]>([]);
+    const [recentProjects, setRecentProjects] = useState<Project[]>([]);
 
+    const addProject = (project: Project) => {
+        setProjects([...projects, project])
+    }
     return (
-        <ProjectContext.Provider value={{ project, setProject }}>
+        <ProjectContext.Provider value={{ projects, recentProjects, setProjects, setRecentProjects, addProject }}>
             {children}
         </ProjectContext.Provider>
     );

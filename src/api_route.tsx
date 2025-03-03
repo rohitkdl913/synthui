@@ -2,23 +2,27 @@
 const apiUrl = import.meta.env.VITE_TRANSLATION_SERVER_URL;
 
 class APIRoute {
-    static CreateaProject=apiUrl + "/create-project";
-    static VideoStream= apiUrl+"/stream/video"
-    static ThumbnailStream= apiUrl+"/stream/thumbnail"
+    static createProject = apiUrl + "/create-project";
+    static deleteProject = apiUrl + "/delete/project"
 
-    static project= apiUrl+"/project"
-    static projectStatus= apiUrl+"/project/status"
-    static projectStream= apiUrl+"/project/stream"
+    static streamVideo = apiUrl + "/stream/video"
+    static streamThumbnail = apiUrl + "/stream/thumbnail"
 
-
-    static exportSubtitle= apiUrl+"/export/subtitle"
-
-
-    static deleteProject=apiUrl+"/delete/project"
+    static project = apiUrl + "/project"
+    static projectStatus = apiUrl + "/project/status"
+    static projectStream = apiUrl + "/project/stream"
 
 
-    static addSubtitle= apiUrl+"/subtitle"
+    static exportSubtitle = apiUrl + "/export/subtitle"
 
+    static subtitle = apiUrl + "/subtitle"
+    static generateWithAI = apiUrl + "/ai";
+
+    static auth = apiUrl + "/auth";
+    static login = this.auth + "/login";
+    static signup = this.auth + "/signup"
+    static user= this.auth + "/user"
+    static logout = this.auth + "/logout"
 }
 
-export default  APIRoute;
+export default APIRoute;

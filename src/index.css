@@ -1,22 +1,12 @@
-@import url('https://fonts.googleapis.com/css2?family=Reddit+Sans:ital,wght@0,200..900;1,200..900&display=swap');
 @import "tailwindcss";
 
 
 
-
 :root {
-    --primary: #000000;
-    --secondary: #ffffff10;
-    --foreground: #ffffff;
-    --danger: #ba0000;
-    --subtitle: #237bff;
-    --outline: 2px;
-}
 
-* {
-    font-family: "Reddit Sans",serif;
-}
 
-.scrollbar-hide::-webkit-scrollbar {
-    display: none;
+    --primary-color: #80419c;
+    --primary-hover: #6a3483;
+    --primary-light: #f3ebf6;
+
 }

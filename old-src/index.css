@@ -1,0 +1,44 @@
+@import url('https://fonts.googleapis.com/css2?family=Reddit+Sans:ital,wght@0,200..900;1,200..900&display=swap');
+@import "tailwindcss";
+
+
+
+
+:root {
+    --primary: #000000;
+    --secondary: #ffffff10;
+    --foreground: #ffffff;
+    --danger: #ba0000;
+    --subtitle: #237bff;
+    --outline: 2px;
+
+    --main: #101010;
+    --secondary: #202020;
+    --hover: #80419C;
+    --text-color:#ffffff;
+    --card-color:#303030;
+}
+
+* {
+    font-family: "Reddit Sans", serif;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+}
+
+.bg-primary {
+    background-color: var(--primary);
+}
+
+.bg-secondary {
+    background-color: var(--secondary);
+}
+
+.text-primary {
+    color: var(--primary);
+}
+
+.text-secondary {
+    color: var(--secondary);
+}

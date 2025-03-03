@@ -1,22 +1,24 @@
+import { X } from "lucide-react";
 import APIRoute from "../../../api_route";
-import { useProject } from "../../provider/project_provider";
+import { Project } from "../../model/project";
 
 interface ExportDialogProp {
     onClose: () => void;
-
+    currentProject: Project
 }
 
 
-const ExportDialog: React.FC<ExportDialogProp> = ({ onClose }) => {
+const ExportDialog: React.FC<ExportDialogProp> = ({ onClose, currentProject }) => {
 
-    const { project } = useProject();
+
+
 
     const handleExport = async () => {
-        if (!project) return;
+        if (!currentProject) return;
 
         try {
             // Assuming the API returns the SRT file for subtitles
-            const response = await fetch(`${APIRoute.exportSubtitle}/${project.projectId}`, {
+            const response = await fetch(`${APIRoute.exportSubtitle}/${currentProject.id}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/octet-stream', // For binary file download
@@ -32,7 +34,7 @@ const ExportDialog: React.FC<ExportDialogProp> = ({ onClose }) => {
             const downloadUrl = window.URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.href = downloadUrl;
-            link.download = `${project.projectName}.srt`; // Name the file with project name
+            link.download = `${currentProject.name}.srt`; // Name the file with project name
             link.click();
 
         } catch (error) {
@@ -40,7 +42,7 @@ const ExportDialog: React.FC<ExportDialogProp> = ({ onClose }) => {
         }
     };
 
-    if (!project) {
+    if (!currentProject) {
         return <p>No project loaded.</p>;
     }
     return <div className="fixed inset-0 flex items-center justify-center backdrop-blur-sm z-100">
@@ -50,7 +52,7 @@ const ExportDialog: React.FC<ExportDialogProp> = ({ onClose }) => {
                 className="absolute top-2 right-2 text-gray-600 hover:text-gray-900"
                 onClick={onClose}
             >
-                <span> &times;</span>
+                <X></X>
             </button>
 
             {/* Title */}
@@ -59,19 +61,19 @@ const ExportDialog: React.FC<ExportDialogProp> = ({ onClose }) => {
             {/* Project Name */}
             <div className="flex items-center gap-4 mb-4">
                 <div className="w-25 h-16 bg-gray-200 rounded">
-                    <img src={`${APIRoute.ThumbnailStream}/${project.projectId}`} alt={project.projectName} className="w-full h-full object-fill" />
+                    <img src={`${APIRoute.streamThumbnail}/${currentProject.id}`} className="w-full h-full object-fill" />
                 </div>
-                <p className="font-semibold">{project.projectName}</p>
+                <p className="font-semibold">{currentProject.name}</p>
             </div>
 
             {/* Export Options */}
-            <select className="w-full p-2 border rounded mb-4">
+            <select className="w-full p-2 border rounded mb-4 focus:border-[#80419c] focus:outline-none focus:ring-1 focus:ring-[#80419c]">
                 {/* <option>Embed video subtitle</option> */}
-                <option>Only subtitle file</option>
+                <option value={"SUBTITLE"}>Only subtitle file</option>
             </select>
 
             {/* Export Button */}
-            <button className="bg-blue-500 text-white w-full py-2 rounded hover:bg-blue-600" onClick={handleExport}>
+            <button className="bg-(--primary-color) text-white w-full py-2 rounded hover:bg-(--primary-hover)" onClick={handleExport}>
                 Export
             </button>
         </div>

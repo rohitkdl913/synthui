@@ -61,8 +61,6 @@ const ProjectCreationDialog: React.FC<ProjectCreationDialogProp> = ({ onClose, f
             const data = await response.json();
             console.log("Project created:", data);
 
-
-            // Navigate to editor page
             navigate(`/editor/${data.data.id}`);
         } catch (e: any) {
             console.error("Error creating project:", e);

@@ -1,8 +1,10 @@
-import { useEffect, useRef, useState } from "react";
-import { MdAdd, MdAlignHorizontalCenter, MdAlignHorizontalLeft, MdAlignHorizontalRight, MdClose, MdRemove } from "react-icons/md";
-import { Subtitle, useSubtitles } from "../../provider/subtitle_provider";
-import APIRoute from "../../../api_route";
+import { AlignCenter, AlignLeft, AlignRight, X } from "lucide-react";
+import { useSubtitles } from "../../provider/subtitle_provider";
+import { useSubtitleEditor } from "../controller/subtitle_edit_logic";
 import { useProject } from "../../provider/project_provider";
+import { useEditorPageLogic } from "../controller/editor_logic";
+import APIRoute from "../../../api_route";
+import { useRef, useState } from "react";
 
 interface SubtitleEditProps {
   onClose: () => void;
@@ -11,17 +13,13 @@ interface SubtitleEditProps {
 export const SubtitleEdit: React.FC<SubtitleEditProps> = ({ onClose }) => {
 
   const { selectedSubtitle } = useSubtitles();
-  const { project } = useProject();
+  const { currentProject } = useEditorPageLogic();
 
   let sub = selectedSubtitle;
 
   //It track that we are creating new subtitle or not 
   const isNew: boolean = sub == null;
 
-
-  // Refs for API action stack and timeout
-  const apiStack = useRef<Array<{ type: 'add' | 'update' | 'delete'; data: Subtitle }>>([]);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
 
 
@@ -38,13 +36,12 @@ export const SubtitleEdit: React.FC<SubtitleEditProps> = ({ onClose }) => {
       deleteSubtitle(sub.id);
 
       // API call
-      const response = await fetch(`${APIRoute.addSubtitle}/${sub.id}`, {
+      const response = await fetch(`${APIRoute.subtitle}/${sub.id}`, {
         method: 'DELETE'
       });
 
       if (!response.ok) throw new Error('Delete failed');
     } catch (error) {
-      // Revert on error
       addSubtitle(sub);
       console.error('Delete failed:', error);
     }
@@ -66,8 +63,8 @@ export const SubtitleEdit: React.FC<SubtitleEditProps> = ({ onClose }) => {
     try {
       if (isNew) {
         // Create new subtitle
-        subtitle.id = project?.projectId ?? "";
-        const response = await fetch(`${APIRoute.addSubtitle}`, {
+        subtitle.id = currentProject?.id ?? "";
+        const response = await fetch(`${APIRoute.subtitle}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(subtitle)
@@ -87,7 +84,7 @@ export const SubtitleEdit: React.FC<SubtitleEditProps> = ({ onClose }) => {
         });
       } else {
         // Update existing subtitle
-        const response = await fetch(`${APIRoute.addSubtitle}/${sub.id}`, {
+        const response = await fetch(`${APIRoute.subtitle}/${sub.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(subtitle)
@@ -103,160 +100,115 @@ export const SubtitleEdit: React.FC<SubtitleEditProps> = ({ onClose }) => {
     onClose();
   };
 
-  // Clear pending timeout on unmount
-  useEffect(() => {
-    return () => {
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    };
-  }, []);
 
 
-  const [fontSize, setFontSize] = useState(16);
+
+  // const [fontSize, setFontSize] = useState(16);
   const [alignment, setAlignment] = useState<"left" | "center" | "right">("center");
 
   const subtitleTextAreaRef = useRef<HTMLTextAreaElement>(null);
   const subtitleStartTimeRef = useRef<HTMLInputElement>(null);
   const subtitleEndimeRef = useRef<HTMLInputElement>(null);
-  const subtitleFontSelectorRef = useRef<HTMLSelectElement>(null);
-  const subtitleFontWeightRef = useRef<HTMLSelectElement>(null);
+  // const subtitleFontSelectorRef = useRef<HTMLSelectElement>(null);
+  // const subtitleFontWeightRef = useRef<HTMLSelectElement>(null);
 
 
   const { addSubtitle, updateSubtitle, deleteSubtitle } = useSubtitles();
 
-
-
-
-  return <div className="w-full bg-gray-800  shadow-lg text-gray-100 overflow-y-scroll scrollbar-hide">
-    {/* Header with back button */}
-    <div className="flex items-center justify-between  border-b border-gray-700">
-      <h3 className="text-lg font-semibold">Edit Subtitle</h3>
-      <button
-        onClick={onClose}
-        className="p-1 hover:bg-gray-700 rounded transition-colors"
-      >
-        <MdClose className="w-5 h-5" />
-      </button>
-    </div>
-
-    {/* Alignment Controls */}
-    <div className=" border-b border-gray-700 py-2">
-      <div className="flex items-center justify-between">
-        <span className="text-sm">Alignment</span>
-        <div className="flex gap-2">
-          <button className={`p-2 rounded ${alignment === "left" ? "bg-gray-700" : "hover:bg-gray-700"}`}
-            onClick={() => setAlignment("left")}>
-            <MdAlignHorizontalLeft className="w-5 h-5" />
-          </button>
-          <button className={`p-2 rounded ${alignment === "center" ? "bg-gray-700" : "hover:bg-gray-700"}`}
-            onClick={() => setAlignment("center")}>
-            <MdAlignHorizontalCenter className="w-5 h-5" />
-          </button>
-          <button className={`p-2 rounded ${alignment === "right" ? "bg-gray-700" : "hover:bg-gray-700"}`}
-            onClick={() => setAlignment("right")}>
-            <MdAlignHorizontalRight className="w-5 h-5" />
-          </button>
-        </div>
-      </div>
-    </div>
-
-
-
-
-    {/* Time Controls */}
-    <div className=" border-b border-gray-700 py-2">
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm mb-2">Start Time (s)</label>
-          <input
-            ref={subtitleStartTimeRef}
-            type="number"
-            name="startTime"
-            defaultValue={sub.start}
-            step="0.1"
-            className="w-full p-2 bg-gray-700 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
-          />
-        </div>
-        <div>
-          <label className="block text-sm mb-2">End Time (s)</label>
-          <input
-            ref={subtitleEndimeRef}
-            type="number"
-            name="endTime"
-            defaultValue={sub.end}
-            step="0.1"
-            className="w-full p-2 bg-gray-700 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
-          />
-        </div>
-      </div>
-    </div>
-
-    {/* Text Editor Form */}
-    <textarea
-      ref={subtitleTextAreaRef}
-      name="content"
-      placeholder="Subtitle text"
-      defaultValue={sub.text}
-      className="w-full p-2 bg-gray-700 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none"
-      rows={4}
-    />
-
-    <div className="grid grid-cols-2 gap-4 py-2">
-      <select
-        ref={subtitleFontSelectorRef}
-        name="font"
-        className="p-2 bg-gray-700 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
-      >
-        <option value="RedditSans">RedditSans</option>
-      </select>
-
-      <select
-        ref={subtitleFontWeightRef}
-        name="fontweight"
-        className="p-2 bg-gray-700 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
-      >
-        <option value="small">Small</option>
-        <option value="medium">Medium</option>
-        <option value="large">Large</option>
-      </select>
-    </div>
-
-    <div className="flex items-center justify-between bg-gray-700 p-2 rounded-md mb-4">
-      <span className="text-sm">Size</span>
-      <div className="flex items-center gap-2">
+  return (
+    <div className="w-full bg-white text-gray-900 scrollbar-hide p-4">
+      <div className="flex items-center justify-between border-b border-gray-300">
+        <h3 className="text-lg font-semibold text-[var(--primary-color)]">Edit Subtitle</h3>
         <button
-          type="button"
-          onClick={() => setFontSize(prev => Math.max(8, prev - 1))}
-          className="p-1 hover:bg-gray-600 rounded"
+          onClick={onClose}
+          className="p-1 hover:text-[var(--primary-hover)] rounded transition-colors"
         >
-          <MdRemove className="w-4 h-4" />
-        </button>
-        <span className="px-2">{fontSize}</span>
-        <button
-          type="button"
-          onClick={() => setFontSize(prev => Math.min(72, prev + 1))}
-          className="p-1 hover:bg-gray-600 rounded"
-        >
-          <MdAdd className="w-4 h-4" />
+          <X className="w-5 h-5" />
         </button>
       </div>
-    </div>
 
-    <button
-      className="w-full py-2  bg-blue-600 hover:bg-blue-700 rounded-md transition-colors" onClick={() => onSave()}
-    >
-      {isNew ? "Save" : "Update"}
-    </button>
+      <div className="border-b border-gray-300 py-2">
+        <div className="flex items-center justify-between">
+          <span className="text-sm">Alignment</span>
+          <div className="flex gap-2">
+            <button
+              className={`p-2 rounded ${alignment === "left" ? "bg-[var(--primary-light)]" : "hover:bg-[var(--primary-light)]"}`}
+              onClick={() => setAlignment("left")}
+            >
+              <AlignLeft className="w-5 h-5" />
+            </button>
+            <button
+              className={`p-2 rounded ${alignment === "center" ? "bg-[var(--primary-light)]" : "hover:bg-[var(--primary-light)]"}`}
+              onClick={() => setAlignment("center")}
+            >
+              <AlignCenter className="w-5 h-5" />
+            </button>
+            <button
+              className={`p-2 rounded ${alignment === "right" ? "bg-[var(--primary-light)]" : "hover:bg-[var(--primary-light)]"}`}
+              onClick={() => setAlignment("right")}
+            >
+              <AlignRight className="w-5 h-5" />
+            </button>
+          </div>
+        </div>
+      </div>
 
+      <textarea
+        ref={subtitleTextAreaRef}
+        name="content"
+        placeholder="Subtitle text"
+        defaultValue={sub.text}
+        className="w-full p-2 bg-[var(--primary-light)] rounded-md focus:ring-2 focus:ring-[var(--primary-color)] focus:outline-none resize-none"
+        rows={4}
+      />
 
-    {!isNew && <div className="mt-6">
+      {/* Time controls */}
+      <div className="py-2">
+        <div className="flex gap-3">
+          <div className="flex-1">
+            <label className="block text-sm mb-2">Start Time (s)</label>
+            <input
+              ref={subtitleStartTimeRef}
+              type="number"
+              name="startTime"
+              defaultValue={sub.start}
+              step="1"
+              className="w-full p-2 bg-[var(--primary-light)] rounded-md focus:ring-2 focus:ring-[var(--primary-color)] focus:outline-none"
+            />
+          </div>
+          <div className="flex-1">
+            <label className="block text-sm mb-2">End Time (s)</label>
+            <input
+              ref={subtitleEndimeRef}
+              type="number"
+              name="endTime"
+              defaultValue={sub.end}
+              step="1"
+              className="w-full p-2 bg-[var(--primary-light)] rounded-md focus:ring-2 focus:ring-[var(--primary-color)] focus:outline-none"
+            />
+          </div>
+        </div>
+      </div>
+
       <button
-        onClick={onDelete}
-        className="w-full py-2  bg-red-600 hover:bg-red-700 rounded-md transition-colors"
+        className="w-full py-2 bg-[var(--primary-color)] hover:bg-[var(--primary-hover)] text-white rounded-md transition-colors mt-5"
+        onClick={onSave}
       >
-        Delete
+        {isNew ? "Save" : "Update"}
       </button>
-    </div>}
-  </div>
 
-
+      {!isNew && (
+        <div className="mt-6">
+          <button
+            onClick={onDelete}
+            className="w-full py-2 bg-red-600 hover:bg-red-700 rounded-md transition-colors text-white"
+          >
+            Delete
+          </button>
+        </div>
+      )}
+    </div>
+  );
 };
+
+export default SubtitleEdit;
