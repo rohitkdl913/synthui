@@ -14,9 +14,9 @@ const Dashboard: React.FC = () => {
         <div className="flex flex-col h-screen bg-gray-50 overflow-hidden ">
             <div className="flex flex-1 overflow-hidden">
                 <SideBar></SideBar>
-                <div className="flex-1 flex flex-col pb-7 gap-3">
+                <div className="flex-1">
                     <Header></Header>
-                    <main className="p-6 pb-10  overflow-y-auto h-screen gap-5 flex flex-col">
+                    <main className="p-6 pb-10  overflow-y-auto h-screen">
                         <UploadNewVideo></UploadNewVideo>
                         <ProjectList></ProjectList>
 
