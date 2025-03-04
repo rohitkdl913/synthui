@@ -14,6 +14,7 @@ import AccountSettings from './features/dashboard/pages/settings/account_setting
 import { ProjectProvider } from './features/provider/project_provider';
 import Editor from './features/editor/page/editor';
 import { SubtitleProvider } from './features/provider/subtitle_provider';
+import ChangePassword from './features/dashboard/components/change_password';
 
 
 
@@ -45,6 +46,7 @@ function App() {
                   <Route path="subtitle" element={<SubtitleSettings />} />
                   <Route path="application" element={<ApplicationSettings />} />
                   <Route path="account" element={<AccountSettings />} />
+                  <Route path="account/change-password" element={<ChangePassword />} />
                 </Route>
 
 
