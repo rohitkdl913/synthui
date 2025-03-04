@@ -12,7 +12,7 @@ const LoginPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const { showToast } = useToast();
   const { login } = useAuth();
-
+ 
 
   const emailRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);

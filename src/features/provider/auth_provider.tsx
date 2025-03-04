@@ -76,11 +76,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const logout = async () => {
     try {
-      await fetch('/api/auth/logout', {
-        method: 'POST',
-        credentials: 'include',
-      });
+      await fetch(`${APIRoute.logout}`, { method: 'POST', credentials: 'include' });
       setUser(null);
+      showToast('Logout successful!', 'success');
+      navigate("/login", { replace: true });
       return true;
     } catch (error) {
       console.error('Logout failed:', error);
@@ -101,7 +100,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (!response.ok) throw new Error(data.detail);
 
       showToast('Account created successfully!', 'success');
-      navigate("/login",{ replace: true });
+      navigate("/login", { replace: true });
     } catch (error: any) {
       showToast(error.message, 'error');
     }

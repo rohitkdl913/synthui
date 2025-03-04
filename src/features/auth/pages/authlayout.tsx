@@ -1,5 +1,7 @@
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useEffect } from 'react';
 import logo from '../../../assets/logo/logo.png';
+import { useAuth } from '../../provider/auth_provider';
+import { useNavigate } from 'react-router-dom';
 
 interface AuthLayoutProps {
   children: ReactNode;
@@ -8,6 +10,18 @@ interface AuthLayoutProps {
 }
 
 const AuthLayout: React.FC<AuthLayoutProps> = ({ children, title, subtitle }) => {
+
+
+  const { user } = useAuth();
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    if (user != null) {
+      navigate('/dashboard');
+    }
+  }, [user, navigate]);
+
+
   return (
     <div className="flex min-h-screen bg-gray-50">
       {/* Left side - hero image */}
@@ -15,10 +29,10 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({ children, title, subtitle }) =>
         <div className="absolute inset-0 bg-gradient-to-br from-purple-900 to-purple-500 opacity-90"></div>
         <div className="flex flex-col justify-center items-center relative z-10 px-12 text-white">
           <div className='flex flex-col justify-center items-center'>
-          <img src={logo} alt="Logo" className="h-[60%] mr-5 " style={{aspectRatio: '90/83'}} />
-        <div className="text-4xl font-semibold">
-            SubtitleSynth<sup className="text-xl">AI</sup>
-        </div>
+            <img src={logo} alt="Logo" className="h-[60%] mr-5 " style={{ aspectRatio: '90/83' }} />
+            <div className="text-4xl font-semibold">
+              SubtitleSynth<sup className="text-xl">AI</sup>
+            </div>
           </div>
         </div>
       </div>

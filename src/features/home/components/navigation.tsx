@@ -19,6 +19,12 @@ const Navigation: React.FC<{
                             {item.name}
                         </a>
                     ))}
+                    <a
+                        href="/login"
+                        className="bg-(--primary-color) hover:bg-(--primary-hover) text-white font-medium py-3 px-6 rounded-md inline-block"
+                    >
+                        Login
+                    </a>
                 </div>
 
             </div>

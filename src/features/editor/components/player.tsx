@@ -257,7 +257,7 @@ const Player: React.FC<PlayerProps> = ({ videoRef, setCurrentTime, setDuration }
       <div className="flex-1 flex items-center justify-center overflow-hidden">
         <video
           ref={videoRef}
-          className="max-h-full max-w-full"
+          className="h-full w-full"
           src={APIRoute.streamVideo + "/" + currentProject?.id} // Replace with your video source
           onPlay={() => setIsPlaying(true)}
           onPause={() => setIsPlaying(false)}

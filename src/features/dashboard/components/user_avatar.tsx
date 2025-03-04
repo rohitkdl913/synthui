@@ -2,12 +2,12 @@ import { User } from "lucide-react";
 import { useDialog } from "../../provider/dialog_provider";
 import { useAuth } from "../../provider/auth_provider";
 import { useState } from "react";
-import APIRoute from "../../../api_route";
+
 import { useNavigate } from "react-router-dom";
 
 const Avatar = () => {
     const { openDialog, closeDialog } = useDialog();
-    const { user } = useAuth();
+    const { user,logout } = useAuth();
     const [isMenuOpen, setIsMenuOpen] = useState(false); 
 
     const toggleMenu = () => setIsMenuOpen((prev) => !prev);
@@ -15,12 +15,13 @@ const Avatar = () => {
 
 
     const handleLogout = async () => {
-        try {
-            await fetch(`${APIRoute.logout}`, { method: 'POST', credentials: 'include' });
-            navigate("/login");
-        } catch (err) {
-            console.error('Logout failed:', err);
-        }
+        // try {
+            // await fetch(`${APIRoute.logout}`, { method: 'POST', credentials: 'include' });
+        //     navigate("/login");
+        // } catch (err) {
+        //     console.error('Logout failed:', err);
+        // }
+        logout();
     };
 
     return (

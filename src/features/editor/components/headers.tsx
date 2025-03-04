@@ -7,26 +7,26 @@ import { Project } from '../../model/project';
 
 
 interface HeadersProps {
-  
-    currentProject:Project  
+
+    currentProject: Project
     onGenerateWithAi: () => void;
 }
 
 const Headers: React.FC<HeadersProps> = ({ currentProject, onGenerateWithAi }) => {
-    const {openDialog,closeDialog}= useDialog();
+    const { openDialog, closeDialog } = useDialog();
 
 
 
-    const showExport=()=>{
-        openDialog(<ExportDialog onClose={closeDialog} currentProject={currentProject}/>);
+    const showExport = () => {
+        openDialog(<ExportDialog onClose={closeDialog} currentProject={currentProject} />);
     }
     return (
         <header className="flex justify-between items-center p-4  border-b border-gray-200">
             <div className="flex items-center gap-4">
                 <Branding></Branding>
-                <h1 className="font-bold">{currentProject.name || "Untitled"}</h1>
 
             </div>
+            <h1 className="font-bold">{currentProject.name || "Untitled"}</h1>
 
             <div className="flex gap-4">
                 {/* <Tooltip text="Correct with AI" position="bottom"> */}

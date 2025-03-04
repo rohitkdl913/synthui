@@ -16,7 +16,7 @@ const CtaSection: React.FC<CtaSectionProps> = ({
                 <div>
                     <h2 className="text-2xl md:text-3xl font-bold mb-8">{title}</h2>
                     <a
-                        href="/login"
+                        href="/signup"
                         className="bg-(--primary-color) hover:bg-(--primary-hover) text-white font-medium py-3 px-6 rounded-md inline-block"
                     >
                         {buttonPrimaryText}
