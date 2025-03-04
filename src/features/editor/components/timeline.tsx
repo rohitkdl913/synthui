@@ -70,7 +70,7 @@ export default function Timeline({
     };
 
     return (
-        <div className="p-4 border-t border-l rounded-sm border-gray-200 h-full flex flex-col gap-2 ">
+        <div className="pt-4 pr-4 pl-4 border-t border-l rounded-sm border-gray-200 h-[full] flex flex-col gap-2 ">
             {/* Top Controls */}
             <div className="flex justify-between items-center p-2 border border-gray-700 rounded-md">
                 <div className="flex gap-4">

@@ -266,8 +266,8 @@ const Player: React.FC<PlayerProps> = ({ videoRef, setCurrentTime, setDuration }
 
       {/* Subtitle display */}
       <div className="relative">
-        <div className="absolute bottom-16 left-0 right-0 flex justify-center">
-          <div className="bg-black bg-opacity-50 text-white p-2 rounded-md max-w-md text-center">
+        <div className="absolute bottom-3 left-0 right-0 flex justify-center">
+          <div className="backdrop-blur-sm text-white p-2 rounded-md max-w-md text-center">
             {activeSubtitle}
           </div>
         </div>

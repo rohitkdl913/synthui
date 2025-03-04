@@ -67,7 +67,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const userData = { name: data.data.name, email: data.data.email }
       setUser(userData);
       showToast('Login successful!', 'success');
-      document.cookie = `access_token=${data.data.access_token};max-age=604800;path=/;`;
+      // document.cookie = `access_token=${data.data.access_token};max-age=604800;path=/;`;
       navigate("/dashboard", { replace: true });
     } catch (error: any) {
       showToast(error.message, 'error');

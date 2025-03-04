@@ -18,7 +18,7 @@ export const ProjectList: React.FC = () => {
       </div>
 
       <div className="divide-y divide-gray-200 ">
-        {projects.length == 0 ? <div  className='flex justify-center items-center flex-col p-4 gap-4'> <img src="/src/assets/images/empty.png" className='w-50 h-50 object-cover' /><span className='text-gray-500 text-lg'>No projects found</span> </div> :
+        {projects.length == 0 ? <div  className='flex justify-center items-center flex-col p-4 gap-4'> <img src="/src/assets/images/empty.png" className='w-[50%] h-[50%] object-cover' /><span className='text-gray-500 text-lg'>No projects found</span> </div> :
           projects.map((project) => (
             <ProjectCard key={project.id} project={project} />
           ))
