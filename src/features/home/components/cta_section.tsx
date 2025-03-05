@@ -22,13 +22,7 @@ const CtaSection: React.FC<CtaSectionProps> = ({
                         {buttonPrimaryText}
                     </a>
                 </div>
-                <div className="flex justify-center">
-                    <img
-                        src={image}
-                        alt="CTA illustration"
-                        className="rounded-lg shadow-lg max-w-sm"
-                    />
-                </div>
+               
             </div>
         </div>
     );
